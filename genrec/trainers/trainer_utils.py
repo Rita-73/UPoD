@@ -84,11 +84,7 @@ def setup_accelerator(
         resolved_amp = False
         resolved_mp = "no"
 
-    # NCCL collective timeout: the default 600s is too short for 1.7B SFT. A slow
-    # per-epoch checkpoint save under host IO contention (e.g. two 4-GPU jobs sharing
-    # one box) can starve a single rank past 600s, which trips the NCCL watchdog and
-    # kills the whole process group — this is exactly what crashed the toys run
-    # (see memory: onerec-sft-nccl-crash). 30 min gives ample slack with no downside.
+    
     nccl_kwargs = InitProcessGroupKwargs(timeout=timedelta(minutes=30))
     return Accelerator(
         split_batches=split_batches,
