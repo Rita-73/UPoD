@@ -1,0 +1,16 @@
+include "tiger.gin"
+
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.balance_lambda = 0.1
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.sinkhorn_epsilon = 0.01
+
+genrec.trainers.tiger_trainer.train.eval_test_on_improvement = True
+genrec.trainers.tiger_trainer.train.eval_test_every_epoch = 2
+genrec.trainers.tiger_trainer.train.eval_test_at_end = True
+
+genrec.trainers.tiger_trainer.train.ual_beta = 0.1
+genrec.trainers.tiger_trainer.train.ual_beta_warmup_epochs = 50
+genrec.trainers.tiger_trainer.train.ual_ema_decay = 0.9
+
+genrec.trainers.tiger_eval.eval_checkpoint.debias_alpha = 0.1
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_min = 0.5
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_max = 1.0

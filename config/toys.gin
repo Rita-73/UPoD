@@ -1,0 +1,12 @@
+include "tiger.gin"
+
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.balance_lambda = 0.7
+
+genrec.trainers.tiger_trainer.train.eval_test_on_improvement = False
+genrec.trainers.tiger_trainer.train.eval_test_every_epoch = 0
+genrec.trainers.tiger_trainer.train.eval_test_at_end = True
+
+genrec.trainers.tiger_eval.eval_checkpoint.debias_alpha = 0.2
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_min = 0.5
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_max = 1.0
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_levels = [0]

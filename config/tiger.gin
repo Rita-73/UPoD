@@ -1,0 +1,129 @@
+
+MODEL_HUB_SENTENCE_T5_XL = "sentence-transformers/sentence-t5-xl"
+
+import genrec.data.amazon
+import genrec.models.tiger
+import genrec.trainers.tiger_trainer
+import genrec.trainers.rqkmeans_pop_balance_trainer
+import genrec.trainers.tiger_eval
+
+# --- TIGER ---
+genrec.trainers.tiger_trainer.train.epochs = 200
+genrec.trainers.tiger_trainer.train.learning_rate = 1e-4
+genrec.trainers.tiger_trainer.train.weight_decay = 0.0
+genrec.trainers.tiger_trainer.train.batch_size = 256
+genrec.trainers.tiger_trainer.train.infer_batch_size = 96
+genrec.trainers.tiger_trainer.train.beam_size = 30
+genrec.trainers.tiger_trainer.train.early_stop_patience = 10
+genrec.trainers.tiger_trainer.train.eval_test_every_epoch = 2
+genrec.trainers.tiger_trainer.train.do_test_eval = True
+genrec.trainers.tiger_trainer.train.eval_test_at_end = True
+
+genrec.trainers.tiger_trainer.train.num_layers = 4
+genrec.trainers.tiger_trainer.train.num_decoder_layers = 4
+genrec.trainers.tiger_trainer.train.d_model = 128
+genrec.trainers.tiger_trainer.train.d_ff = 1024
+genrec.trainers.tiger_trainer.train.num_heads = 6
+genrec.trainers.tiger_trainer.train.d_kv = 64
+genrec.trainers.tiger_trainer.train.dropout_rate = 0.1
+genrec.trainers.tiger_trainer.train.feed_forward_proj = 'relu'
+
+genrec.trainers.tiger_trainer.train.codebook_size = 256
+genrec.trainers.tiger_trainer.train.sem_id_dim = 4
+genrec.trainers.tiger_trainer.train.max_seq_len = 50
+
+genrec.trainers.tiger_trainer.train.dataset = @AmazonSeqDataset
+genrec.trainers.tiger_trainer.train.dataset_folder = "dataset"
+genrec.trainers.tiger_trainer.train.save_dir_root = "out/{split}/"
+genrec.trainers.tiger_trainer.train.wandb_logging = False
+genrec.trainers.tiger_trainer.train.wandb_project = "UPoD_{split}"
+
+AmazonSeqDataset.split = "{split}"
+AmazonSeqDataset.encoder_model_name = %MODEL_HUB_SENTENCE_T5_XL
+AmazonSeqDataset.id_type = "rqkmeans_pop_balance"
+AmazonSeqDataset.add_disambiguation = True
+AmazonSeqDataset.item_embedding_mode = "baseline"
+AmazonSeqDataset.item_dataset = @AmazonItemDataset
+AmazonSeqDataset.pretrained_rqkmeans_path = "./out/{split}/rqkmeans.pt"
+AmazonSeqDataset.rqkmeans_codebook_size = 256
+AmazonSeqDataset.rqkmeans_n_layers = 3
+
+AmazonItemDataset.split = "{split}"
+AmazonItemDataset.encoder_model_name = %MODEL_HUB_SENTENCE_T5_XL
+AmazonItemDataset.item_embedding_mode = "baseline"
+
+genrec.trainers.tiger_trainer.train.enable_ual = True
+genrec.trainers.tiger_trainer.train.ual_beta = 0.1
+genrec.trainers.tiger_trainer.train.ual_beta_warmup_epochs = 30
+genrec.trainers.tiger_trainer.train.ual_num_bins = 10
+genrec.trainers.tiger_trainer.train.ual_ema_decay = 0.9
+genrec.trainers.tiger_trainer.train.ual_holdout = 2
+genrec.trainers.tiger_trainer.train.ual_use_log_norm = True
+genrec.trainers.tiger_trainer.train.ual_lambda_mode = "uniform"
+genrec.trainers.tiger_trainer.train.ual_lambda_p = 1.0
+genrec.trainers.tiger_trainer.train.ual_lambda_q = 2.0
+genrec.trainers.tiger_trainer.train.ual_lambda_floor = 0.0
+genrec.trainers.tiger_trainer.train.ual_lambda_uniform_mix = 0.0
+genrec.trainers.tiger_trainer.train.enable_ual_entropy_gate = True
+genrec.trainers.tiger_trainer.train.ual_entropy_gate_detach = True
+genrec.trainers.tiger_trainer.train.ual_entropy_gate_ema_decay = 0.99
+genrec.trainers.tiger_trainer.train.ual_entropy_gate_per_level = False
+genrec.trainers.tiger_trainer.train.ual_aux_weight = 0.0
+genrec.trainers.tiger_trainer.train.ual_aux_hidden = 128
+genrec.trainers.tiger_trainer.train.ual_gate_ema_decay = 0.99
+genrec.trainers.tiger_trainer.train.ual_match_mode = "onesided_cdf_hot"
+genrec.trainers.tiger_trainer.train.ual_reduce_mode = "aggregate"
+genrec.trainers.tiger_trainer.train.ual_target_mode = "uniform"
+
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.n_layers = 3
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.codebook_size = 256
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.random_state = 42
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.max_iter = 100
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.batch_size = 4096
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.dataset = @AmazonItemDataset
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.dataset_folder = "dataset"
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.encoder_model_name = %MODEL_HUB_SENTENCE_T5_XL
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.item_embedding_mode = "baseline"
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.balance_scope = "first"
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.balance_lambda = 0.5
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.popularity_holdout = 2
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.sinkhorn_epsilon = 0.1
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.sinkhorn_max_iter = 100
+genrec.trainers.rqkmeans_pop_balance_trainer.fit_rqkmeans_pop_balance.save_dir_root = "out/{split}"
+
+genrec.trainers.tiger_eval.eval_checkpoint.dataset = @AmazonSeqDataset
+genrec.trainers.tiger_eval.eval_checkpoint.dataset_folder = "dataset"
+genrec.trainers.tiger_eval.eval_checkpoint.split = "{split}"
+genrec.trainers.tiger_eval.eval_checkpoint.save_dir_root = "out/{split}/"
+genrec.trainers.tiger_eval.eval_checkpoint.pretrained_rqkmeans_path = "./out/{split}/rqkmeans.pt"
+genrec.trainers.tiger_eval.eval_checkpoint.infer_batch_size = 96
+genrec.trainers.tiger_eval.eval_checkpoint.beam_size = 30
+genrec.trainers.tiger_eval.eval_checkpoint.decode_mode = "beam"
+genrec.trainers.tiger_eval.eval_checkpoint.eval_top_ks = [5, 10]
+genrec.trainers.tiger_eval.eval_checkpoint.fair_eval_top_ks = [5, 10]
+genrec.trainers.tiger_eval.eval_checkpoint.max_seq_len = 50
+genrec.trainers.tiger_eval.eval_checkpoint.sem_id_dim = 4
+genrec.trainers.tiger_eval.eval_checkpoint.codebook_size = 256
+genrec.trainers.tiger_eval.eval_checkpoint.num_layers = 4
+genrec.trainers.tiger_eval.eval_checkpoint.num_decoder_layers = 4
+genrec.trainers.tiger_eval.eval_checkpoint.d_model = 128
+genrec.trainers.tiger_eval.eval_checkpoint.d_ff = 1024
+genrec.trainers.tiger_eval.eval_checkpoint.num_heads = 6
+genrec.trainers.tiger_eval.eval_checkpoint.d_kv = 64
+genrec.trainers.tiger_eval.eval_checkpoint.dropout_rate = 0.1
+genrec.trainers.tiger_eval.eval_checkpoint.feed_forward_proj = 'relu'
+genrec.trainers.tiger_eval.eval_checkpoint.enable_fair_metrics = True
+genrec.trainers.tiger_eval.eval_checkpoint.enable_pl_metrics = True
+genrec.trainers.tiger_eval.eval_checkpoint.auto_infer_from_checkpoint = False
+genrec.trainers.tiger_eval.eval_checkpoint.run_valid = False
+genrec.trainers.tiger_eval.eval_checkpoint.run_test = True
+genrec.trainers.tiger_eval.eval_checkpoint.amp = False
+genrec.trainers.tiger_eval.eval_checkpoint.mixed_precision_type = "no"
+
+genrec.trainers.tiger_eval.eval_checkpoint.enable_bias_debias = True
+genrec.trainers.tiger_eval.eval_checkpoint.debias_backend = 'ugd'
+genrec.trainers.tiger_eval.eval_checkpoint.debias_alpha = 0.1
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_entropy_gamma = True
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_entropy_gamma_share_level0 = False
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_min = 0.5
+genrec.trainers.tiger_eval.eval_checkpoint.ugd_gamma_max = 1.0
