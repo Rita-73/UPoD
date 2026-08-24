@@ -7,13 +7,11 @@ python -u genrec/trainers/rqkmeans_pop_balance_trainer.py config/beauty.gin --sp
 
 ### 2. Uncertainty-aware GR training
 
-python -u genrec/trainers/tiger_trainer.py config/beauty.gin --split beauty \
-  --gin "genrec.trainers.tiger_trainer.train.save_dir_root='out/beauty/'"
+python -u genrec/trainers/tiger_trainer.py config/beauty.gin --split beauty
 
 ### 3. Uncertainty-gated decoding
 
 python -u genrec/trainers/tiger_eval.py config/beauty.gin --split beauty \
-  --gin "genrec.trainers.tiger_eval.eval_checkpoint.checkpoint_path='out/beauty/best_model.pt'" \
-  --gin "genrec.trainers.tiger_eval.eval_checkpoint.output_json='out/beauty/eval_beam30.json'"
+  --gin "genrec.trainers.tiger_eval.eval_checkpoint.checkpoint_path='out/beauty/best_model.pt'"
 
 Our implementation code is based on [GenRec](https://github.com/phonism/genrec).
