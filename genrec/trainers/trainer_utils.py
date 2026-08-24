@@ -42,11 +42,6 @@ def set_seed(seed: int, deterministic: bool = False) -> None:
 
 
 def gpu_supports_bf16() -> bool:
-    """Return True only when bf16 GEMM is expected to work (Ampere+, SM >= 8.0).
-
-    torch.cuda.is_bf16_supported() can be True on older Pascal GPUs while CUBLAS
-    still rejects CUDA_R_16BF (TITAN X on this cluster).
-    """
     if not torch.cuda.is_available():
         return False
     major, _ = torch.cuda.get_device_capability()
@@ -61,18 +56,6 @@ def setup_accelerator(
     amp: bool = False,
     mixed_precision_type: str = "fp16",
 ) -> Accelerator:
-    """
-    Setup and return an Accelerator instance.
-
-    Args:
-        split_batches: Whether to split batches across devices
-        gradient_accumulate_every: Gradient accumulation steps
-        amp: Whether to use automatic mixed precision
-        mixed_precision_type: Type of mixed precision ("fp16" or "bf16")
-
-    Returns:
-        Configured Accelerator instance
-    """
     resolved_amp = amp
     resolved_mp = mixed_precision_type
     if amp and mixed_precision_type == "bf16" and not gpu_supports_bf16():
