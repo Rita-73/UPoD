@@ -1,4 +1,3 @@
-"""UPoD: Uniform-target Population Debiasing for generative recommendation."""
 
 __version__ = "0.1.0"
 
