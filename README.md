@@ -1,4 +1,5 @@
 # UPoD
+This is the implementation of the paper: Uncertainty-Aware Popularity Debiasing for Generative Recommendation
 
 ### 1. Popularity-balanced encoding
 
