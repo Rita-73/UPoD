@@ -1,6 +1,6 @@
 # UPoD
 
-Implementation of **Uncertainty-Aware Popularity Debiasing for Generative Recommendation**.
+Implementation of **Uncertainty-Aware Popularity Debiasing for Generative Recommendation (UPoD)**.
 
 UPoD mitigate popularity bias in SID-based generative recommenders with three components:
 
