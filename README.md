@@ -53,6 +53,17 @@ UPoD/
 | Amazon Toys | `toys` | `config/toys.gin` | Toys & games |
 | MovieLens-1M | `movielens1m` | `config/movielens1m.gin` | Movies |
 
+**Raw** (`dataset/<split>/raw/`):
+
+Downloaded automatically during SID encoding (step 1).
+
+**Processed** (`dataset/<split>/processed/`):
+
+- `item_emb_sentence-t5-xl.parquet` — sentence-t5-xl item semantic embeddings
+- `item_id_mapping.json` — item ID map
+- `fair_eval/item_popularity.json` — training set item popularity
+
+
 ---
 
 ## Quick start (Beauty)
@@ -64,6 +75,11 @@ UPoD/
 ```bash
 python -u genrec/trainers/rqkmeans_pop_balance_trainer.py config/beauty.gin --split beauty
 ```
+**Arguments:**
+
+| Argument | Description |
+|---|---|
+| `save_dir_root` | Balance-ID codebook output directory |
 
 ### 2. Uncertainty-aware GR training
 
@@ -79,12 +95,28 @@ accelerate launch --multi_gpu --num_processes 4 \
   genrec/trainers/tiger_trainer.py config/beauty.gin --split beauty
 ```
 
+**Arguments:**
+
+| Argument | Description |
+|---|---|
+| `save_dir_root` | Path of saved checkpoint |
+| `AmazonSeqDataset.pretrained_rqkmeans_path` | Path of balance-ID codebook |
+| `seed` | Training seed |
+
 ### 3. Uncertainty-gated decoding
 
 
 ```bash
 python -u genrec/trainers/tiger_eval.py config/beauty.gin --split beauty
 ```
+
+**Arguments:**
+
+| Argument | Description |
+|---|---|
+| `checkpoint_path` | Path to saved checkpoint |
+
+---
 
 Replace `beauty` / `config/beauty.gin` with `sports`, `toys`, or `movielens1m` for the other datasets.
 
